@@ -19,7 +19,6 @@ return new class extends Migration
             $table->bigInteger('Quantity');
             $table->string('cost');
             $table->string('price');
-            $table->string('profit');
             $table->timestamps();
         });
     }
