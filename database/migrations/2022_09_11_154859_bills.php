@@ -15,9 +15,11 @@ return new class extends Migration
     {
         Schema::create('bills', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('user_name');
+            $table->string('product_name');
+            $table->string('billnum');
             $table->integer('Quantity');
-            $table->string('cost');
+            $table->string('Quantity_price');
             $table->timestamps();
         });
     }

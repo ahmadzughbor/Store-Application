@@ -16,8 +16,11 @@ return new class extends Migration
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('billnum');
+            $table->string('user_name');
             $table->integer('Quantity');
             $table->string('price');
+            $table->string('fullPrice');
             $table->timestamps();
         });
     }

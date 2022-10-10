@@ -6,63 +6,144 @@ use App\Models\product;
 use App\Models\returns;
 use App\Models\sale;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class salesController extends Controller
 {
     public function sale(Request $request)
     {
+        if(!Auth::guard('api')->user()){
+            return response()->json([
+                'message' => 'you can not do this !'
+            ]);
+        }
         $request->validate([
             'price'=> 'required',
             'Quantity'=> 'required',
+            // 'fullPrice'=> 'required',
             'name'=> 'required',
+            'billnum'=> 'required',
+        ]);
+        $user_name = Auth::guard('api')->user()->name;
+        $fullPrice = $request->price * $request->Quantity;
+        $request->merge([
+            'user_name' =>$user_name,
+            'fullPrice' => $fullPrice,
         ]);
         $Psale = sale::create($request->all());
+        $bill = sale::where('billnum',$request->billnum)->get();
         // $prosale = product::all()->public('name')->toArray();
         $prosale = product::where('name',$request->name)->first();
         $prosale->update([
+            'user_name' => $user_name,
             'Quantity' => $prosale->Quantity - $request->Quantity,
         ]);
         return response()->json([
-            'message' => 'product sale done ',
+            'message' => ' done product sale  ',
             'status' => 200,
-            'data' => $Psale
+            'data' => [
+                'bill'=>$bill,
+                'product sale' =>$Psale
+            ]
         ]);
     }
+
+
+
     public function returns (Request $request)
     {
+        if(!Auth::guard('api')->user()){
+            return response()->json([
+                'message' => 'you can not do this !'
+            ]);
+        }
         $request->validate([
             'price'=> 'required',
             'Quantity'=> 'required',
             'name'=> 'required',
+            'billnum'=> 'required',
         ]);
-        $productR = returns::create($request->all());
+        $fullPrice = $request->price * $request->Quantity;
+        $user_name =Auth::guard('api')->user()->name;
+        $request->merge([
+            'user_name' =>$user_name,
+            'fullPrice' => $fullPrice,
+        ]);
         $proreturn = product::where('name',$request->name)->first();
+        if(!$proreturn){
+            return response()->json([
+                'message' => 'product not found'
+            ]);
+        }
+
+        $productR = returns::create($request->all());
+        $bill = returns::where('billnum',$request->billnum)->paginate();//الفاتورة
+
         $proreturn->update([
+            'user_name' =>$user_name,
             'Quantity' => $proreturn->Quantity + $request->Quantity,
         ]);
 
         return response()->json([
             'message' => 'product return  done ',
             'status' => 200,
-            'data' => $productR
+            'data' => [
+                'bill'=>$bill,
+                'product return' =>$productR
+            ]
         ]);
     }
+
+
+
+
     public function allSales(Request $request)
     {
-        $allSales = sale::all();
+        if(!Auth::guard('api')->user()){
+            return response()->json([
+                'message' => 'you can not do this !'
+            ]);
+        }
+        $allSales = sale::paginate();
+        // $total = sale::all();
+        // $totalq = sale::all()->pluck('Quantity')->toArray();
+        $salestotal = 0;
+        foreach($allSales as $t){
+            $salestotal+= $t->price * $t->Quantity;
+        }
         return response()->json([
             'message' => 'all sales',
             'status' => 200,
-            'data' => $allSales
+            'data' => [
+                'total sales price' =>$salestotal,
+                ' all sales' => $allSales,
+            ]
         ]);
     }
+
+
+
+
     public function allReturns(Request $request)
     {
-        $allReturns = returns::all();
+        if(!Auth::guard('api')->user()){
+            return response()->json([
+                'message' => 'you can not do this !'
+            ]);
+        }
+        $allReturns = returns::paginate();
+        $total = returns::all()->pluck('price')->toArray();
+        $returntotal = 0;
+        foreach($allReturns as $t){
+            $returntotal+= $t->price * $t->Quantity;
+        }
         return response()->json([
-            'message' => 'all sales',
+            'message' => 'all returns',
             'status' => 200,
-            'data' => $allReturns
+            'data' => [
+                'total returns  price' =>$returntotal,
+                ' all returns' => $allReturns,
+            ]
         ]);
     }
 }

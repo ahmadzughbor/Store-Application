@@ -10,6 +10,6 @@ class sale extends Model
     use HasFactory;
     protected $table = 'sales';
     protected $fillable =[
-        'name','Quantity','price'
+        'name','Quantity','price','user_name','billnum','fullPrice'
     ];
 }

@@ -36,11 +36,13 @@ Route::group([
 
 /////products routes ////////
 Route::group([
-    'middleware' => 'api',
+    'middleware' => ['api'],
 ], function () {
     Route::post('product/add',[productsController::class,'add']);
     Route::get('product/allProduct',[productsController::class,'allProduct']);
+    ////////////////////
     Route::post('productsbill/show',[billsController::class,'show']);
+    ////////////////////
     Route::post('sale/pro',[salesController::class,'sale']);
     Route::post('return/pro',[salesController::class,'returns']);
     Route::get('all/sales',[salesController::class,'allSales']);
