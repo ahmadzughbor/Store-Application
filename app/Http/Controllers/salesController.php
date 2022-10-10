@@ -24,6 +24,21 @@ class salesController extends Controller
             'name'=> 'required',
             'billnum'=> 'required',
         ]);
+        $prosale = product::where('name',$request->name)->first();
+        if(!$prosale){
+            return response()->json([
+                'message' => 'cant do it',
+                'status' => 401,
+                'data' =>[],
+            ]);
+        }
+        if($prosale->Quantity < $request->Quantity){
+            return response()->json([
+                'message' => 'There is not enough quantity',
+                'status' => 200,
+                'data' =>[],
+            ]);
+        }
         $user_name = Auth::guard('api')->user()->name;
         $fullPrice = $request->price * $request->Quantity;
         $request->merge([

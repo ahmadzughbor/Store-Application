@@ -13,7 +13,7 @@ class product extends Model
         'name','Quantity','Purchasing_price','user_name','selling_price',
     ];
 
-    public function image()
+    public function images()
     {
         return $this->hasMany(productImage::class,'product_id','id');
     }

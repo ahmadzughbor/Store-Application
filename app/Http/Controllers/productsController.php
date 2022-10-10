@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\bill;
 use App\Models\product;
+use App\Models\productImage;
 use App\Models\returns;
 use App\Models\sale;
 use Illuminate\Http\Request;
@@ -33,7 +34,7 @@ class productsController extends Controller
         $prods = product::all();
         // $Quantity_price = $request->Quantity * $request->price;///السعر الكامل للمنتج المضاف
         $ar=$prods->pluck('name')->toArray();
-
+        $imagepath = null;
         if(in_array($request->name , $ar))
         {
             $prod = product::where('name' ,$request->name)->first();
@@ -42,9 +43,29 @@ class productsController extends Controller
                 'Quantity' => $request->Quantity + $prod->Quantity,
                 'selling_price'=>$request->selling_price
                 ]);
+                // $imagepath = $prod->images()->path;
         }else{
             $prod = product::create($request->all());
+            if ($file = $request->file('file')) {
+                $path = $file->store('public/files');
+                $name = $file->getClientOriginalName();
+                //store your file into directory and db
+                $save = new productImage();
+                $save->product_id = $prod->id;
+                $save->name = $name;
+                $save->path= $path;
+                $save->save();
+                // $imagepath = $prod->images()->path;
+        }else{
+            $path = storage_path('public/files/no_image');
+            $name = 'no_image';
+            $save = new productImage();
+            $save->product_id = $prod->id;
+            $save->name = $name;
+            $save->path= $path;
+            $save->save();
         }
+    }
         bill::create([
             'user_name' => $user_name,
             'product_name' => $request->name,
@@ -59,11 +80,13 @@ class productsController extends Controller
             'status'=>'200',
             'data'=>[
                 'product'=>  $prod ,
+                'product image' =>  $prod->images()->pluck('path')->toArray() ,
                 'bill' => $productbills,
             ],
         ]);
 
     }
+
 
     public function allProduct (Request $request)
     {
@@ -76,6 +99,7 @@ class productsController extends Controller
         $allQuantity = product::all()->pluck('Quantity')->toArray();
         $allSales = sale::all()->pluck('fullPrice')->toArray();
         $salesInf = sale::all();
+        $returnsInf = returns::all();
         $salesnames = sale::all()->pluck('name');
         $allreturns = returns::all()->pluck('fullPrice')->toArray();
         //////////////////////////////////////////////////////
@@ -86,6 +110,7 @@ class productsController extends Controller
         $full_profit =0;
         $withoutprofit =0;
         $contQuantity = 0;
+        $returnsProfit = 0;
         /////////////////////////////////////////////////////
         foreach($allQuantity as $q){
             $contQuantity+= $q;
@@ -100,7 +125,9 @@ class productsController extends Controller
             $full_profit+= $q->price * $q->Quantity;
             $withoutprofit+= product::where('name',$q->name)->first()->Purchasing_price * $q->Quantity;
         }
-
+        foreach($returnsInf as $q){///////get price for all returns
+            $returnsProfit = (product::where('name',$q->name)->first()->selling_price  -  product::where('name',$q->name)->first()->Purchasing_price ) * $q->Quantity ;
+        }
 
 
 
@@ -109,10 +136,10 @@ class productsController extends Controller
             'message' => 'all products is here',
             'status' => 200,
             'data' => [
-                'all Quantity in Store' => $allQuantity,
+                'all Quantity in Store' => $contQuantity,
                 'full sales price' => $full_sales_price,
                 'full returns price' => $full_returns_price,
-                'full profit for sales'=>$full_profit - $withoutprofit,
+                'full profit for sales'=>($full_profit - $withoutprofit)-$returnsProfit ,
                 'Full purchase price for sales' =>$withoutprofit,
                 'all products'=> $products,
                 ]
