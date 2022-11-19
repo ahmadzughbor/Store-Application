@@ -95,7 +95,7 @@ class productsController extends Controller
                 'message' => 'you can not do this !'
             ]);
         }
-        $products = product::paginate();
+        $products = product::with('images')->paginate();
         $allQuantity = product::all()->pluck('Quantity')->toArray();
         $allSales = sale::all()->pluck('fullPrice')->toArray();
         $salesInf = sale::all();
