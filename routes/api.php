@@ -38,8 +38,10 @@ Route::group([
 Route::group([
     'middleware' => ['api'],
 ], function () {
-    Route::post('product/add',[productsController::class,'add']);
-    Route::get('product/allProduct',[productsController::class,'allProduct']);
+    Route::post('product/index',[productsController::class,'index']);
+    Route::post('product/list/store',[productsController::class,'storeItem']);
+    Route::post('storage/add',[productsController::class,'add']);
+    // Route::get('product/allProduct',[productsController::class,'allProduct']);
     ////////////////////
     Route::post('productsbill/show',[billsController::class,'show']);
     ////////////////////

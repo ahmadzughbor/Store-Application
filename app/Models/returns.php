@@ -10,6 +10,6 @@ class returns extends Model
     use HasFactory;
     protected $table = 'returns';
     protected $fillable =[
-        'name','Quantity','price','user_name','billnum','fullPrice'
+        'product_id','Quantity','price','user_name','billnum'
     ];
 }

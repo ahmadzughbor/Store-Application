@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\product;
 use App\Models\returns;
 use App\Models\sale;
+use App\Models\storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,10 +22,10 @@ class salesController extends Controller
             'price'=> 'required',
             'Quantity'=> 'required',
             // 'fullPrice'=> 'required',
-            'name'=> 'required',
+            'product_id'=> 'required',
             'billnum'=> 'required',
         ]);
-        $prosale = product::where('name',$request->name)->first();
+        $prosale = storage::where('product_id',$request->product_id)->first();
         if(!$prosale){
             return response()->json([
                 'message' => 'cant do it',
@@ -40,15 +41,15 @@ class salesController extends Controller
             ]);
         }
         $user_name = Auth::guard('api')->user()->name;
-        $fullPrice = $request->price * $request->Quantity;
+        // $fullPrice = $request->price * $request->Quantity;
         $request->merge([
             'user_name' =>$user_name,
-            'fullPrice' => $fullPrice,
+            // 'fullPrice' => $fullPrice,
         ]);
         $Psale = sale::create($request->all());
         $bill = sale::where('billnum',$request->billnum)->get();
-        // $prosale = product::all()->public('name')->toArray();
-        $prosale = product::where('name',$request->name)->first();
+        // // $prosale = product::all()->public('name')->toArray();
+        // $prosale = product::where('name',$request->name)->first();
         $prosale->update([
             'user_name' => $user_name,
             'Quantity' => $prosale->Quantity - $request->Quantity,
@@ -75,16 +76,16 @@ class salesController extends Controller
         $request->validate([
             'price'=> 'required',
             'Quantity'=> 'required',
-            'name'=> 'required',
+            'product_id'=> 'required',
             'billnum'=> 'required',
         ]);
-        $fullPrice = $request->price * $request->Quantity;
+        // $fullPrice = $request->price * $request->Quantity;
         $user_name =Auth::guard('api')->user()->name;
         $request->merge([
             'user_name' =>$user_name,
-            'fullPrice' => $fullPrice,
+            // 'fullPrice' => $fullPrice,
         ]);
-        $proreturn = product::where('name',$request->name)->first();
+        $proreturn = storage::where('product_id',$request->product_id)->first();
         if(!$proreturn){
             return response()->json([
                 'message' => 'product not found'
@@ -104,7 +105,7 @@ class salesController extends Controller
             'status' => 200,
             'data' => [
                 'bill'=>$bill,
-                'product return' =>$productR
+                'product return' => $productR
             ]
         ]);
     }
