@@ -69,6 +69,7 @@ class productsController extends Controller
             'user_name' => $user_name,
         ]);
         $storegeItem = storage::where('product_id',$request->product_id)->first();
+        $product_name = product::where('id',$request->product_id)->first('name');
         $imagepath = null;
         if ($storegeItem ) {
             $storegeItem->update([
@@ -101,8 +102,8 @@ class productsController extends Controller
         }
         bill::create([
             'user_name' => $user_name,
-            'product_name' => $storegeItem->name,
-            'item_price' => $storegeItem->Purchasing_price,
+            'product_name' => $product_name,
+            'item_price' => $request->Purchasing_price,
             'billnum' => $request->billnum,
             'Quantity' => $request->Quantity,
         ]);

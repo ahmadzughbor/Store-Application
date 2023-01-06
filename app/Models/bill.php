@@ -10,6 +10,10 @@ class bill extends Model
     use HasFactory;
     protected $table = 'bills';
     protected $fillable =[
-        'product_name','Quantity','billnum','Quantity_price','user_name'
+        'product_id','Quantity','billnum','Quantity_price','user_name'
     ];
+
+    public function  product(){
+        return $this->belongsTo(product::class,'product_id','id');
+    }
 }

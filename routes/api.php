@@ -43,7 +43,7 @@ Route::group([
     Route::post('storage/add',[productsController::class,'add']);
     // Route::get('product/allProduct',[productsController::class,'allProduct']);
     ////////////////////
-    Route::post('productsbill/show',[billsController::class,'show']);
+    Route::get('productsbill/show',[billsController::class,'show']);
     ////////////////////
     Route::post('sale/pro',[salesController::class,'sale']);
     Route::post('return/pro',[salesController::class,'returns']);

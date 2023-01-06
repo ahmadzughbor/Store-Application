@@ -9,7 +9,7 @@ class storage extends Model
 {
     use HasFactory;
     protected $table = 'storage';
-    protected $fillable = ['product_id','quantity','Purchasing_price','selling_price','billnum','user_name' ];
+    protected $fillable = ['product_id','Quantity','Purchasing_price','selling_price','billnum','user_name' ];
 
 
     public function product()
